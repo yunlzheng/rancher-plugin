@@ -27,6 +27,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     public static final String UPGRADED = "upgraded";
     public static final String ACTIVE = "active";
+    public static final String INACTIVE = "inactive";
 
     private final String environmentId;
     private final String endpoint;
@@ -57,29 +58,38 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+
         String dockerUUID = String.format("docker:%s", Parser.paraser(image, getBuildEnvs(build, listener)));
         ServiceField serviceField = new ServiceField(this.service);
-        listener.getLogger().println("Deploy [" + getService() + "(" + dockerUUID + ")] to rancher environment [" + endpoint + "/projects/" + getEnvironmentId() + "]");
+        listener.getLogger().printf("Deploy/Upgrade image[%s] to service [%s] to rancher environment [%s/projects/%s]%n", dockerUUID, getService(), endpoint, getEnvironmentId());
 
         Stack stack = getStack(listener, serviceField, rancherClient);
 
         Optional<Services> services = rancherClient.services(stack.getId());
         if (!services.isPresent()) {
-            throw new AbortException("error happen when stack services");
+            throw new AbortException("Error happen when fetch stack<" + stack.getName() + "> services");
         }
 
         Optional<Service> serviceInstance = services.get().getData().stream().filter(service1 -> service1.getName().equals(serviceField.getServiceName())).findAny();
         if (serviceInstance.isPresent()) {
-            listener.getLogger().println("upgrade service");
+            listener.getLogger().println("Upgrading service instance");
+
             upgradeService(serviceInstance.get(), dockerUUID);
         } else {
-            listener.getLogger().println("create service instance");
+            listener.getLogger().println("Creating service instance");
             createService(stack, serviceField.getServiceName(), dockerUUID);
         }
 
     }
 
+    private void checkServiceState(Service serviceInstance) throws AbortException {
+        if (INACTIVE.equalsIgnoreCase(serviceInstance.getState()) || ACTIVE.equalsIgnoreCase(serviceInstance.getState())) {
+            throw new AbortException("Before upgrade service the service instance state should be 'inactive' or 'active'");
+        }
+    }
+
     private void upgradeService(Service service, String dockerUUID) throws IOException {
+        checkServiceState(service);
         ServiceUpgrade serviceUpgrade = new ServiceUpgrade();
         InServiceStrategy inServiceStrategy = new InServiceStrategy();
 
@@ -147,10 +157,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         Optional<Stack> stack = stacks.get().getData().stream().filter(stackItem -> isEqual(serviceField, stackItem)).findAny();
         if (stack.isPresent()) {
-            listener.getLogger().println("Stack already exited. skip");
+            listener.getLogger().println("Stack already exist. skip");
             return stack.get();
         } else {
-            listener.getLogger().println("Stack not existed, create first");
+            listener.getLogger().println("Stack not exist, create first");
             return createStack(serviceField, rancherClient);
         }
     }
