@@ -17,11 +17,7 @@ Jenkins Rancher Plugin Support Deploy or Upgrade Service Instance in Rancher.
 
 ### Job Config
 
-> Tips: docker image support all build variable in current job eq: busybox:dev-${BUILD_NUMBER}
-
-Basic config:
-
-![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/snapshot1.png)
+![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/snapshot.png)
 
 |       variable |         description |       example |
 |----------------|---------------------|---------------|
@@ -31,13 +27,6 @@ Basic config:
 | Rancher Environment Id | data2 | 1a5558 |
 | Service Name | Target Service Name | stack/demo |
 | Docker Image | Deploy Image Tag | busybox |
-
-Advance config:
-
-![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/snapshot2.png)
-
-|       variable |         description |       example |
-|----------------|---------------------|---------------|
 | Auto Confirm   | auto finish upgrade service  | true |
 | Public Ports | ports should export by service | 8080:8080,9090:9090 |
 | Environment Variables | service environments | aaa=bbb,ccc=ddd |
