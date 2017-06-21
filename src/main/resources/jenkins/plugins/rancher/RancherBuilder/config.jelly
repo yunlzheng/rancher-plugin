@@ -1,25 +1,31 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-     <f:entry title="${%parameter.endpoint}" field="endpoint">
+     <f:entry title="${%rancher.endpoint}" field="endpoint">
        <f:textbox />
      </f:entry>
-     <f:entry title="${%parameter.accessKey}" field="accessKey">
+     <f:entry title="${%rancher.accessKey}" field="accessKey">
        <f:textbox />
      </f:entry>
-     <f:entry title="${%parameter.secretKey}" field="secretKey">
+     <f:entry title="${%rancher.secretKey}" field="secretKey">
        <f:textbox />
      </f:entry>
-     <f:entry title="${%parameter.service}" field="service">
+      <f:entry title="${%rancher.environmentId}" field="environmentId">
+        <f:textbox />
+      </f:entry>
+     <f:entry title="${%rancher.service}" field="service">
         <f:textbox />
      </f:entry>
+     <f:entry title="${%rancher.image}" field="image">
+         <f:textbox />
+      </f:entry>
      <f:advanced >
-       <f:entry title="${%parameter.confirm}" field="confirm">
+       <f:entry title="${%rancher.confirm}" field="confirm">
          <f:checkbox/>
        </f:entry>
-       <f:entry title="${%parameter.ports}" field="ports">
+       <f:entry title="${%rancher.ports}" field="ports">
          <f:textbox />
        </f:entry>
-       <f:entry title="${%parameter.environments}" field="environments">
+       <f:entry title="${%rancher.environments}" field="environments">
          <f:textbox />
        </f:entry>
      </f:advanced >

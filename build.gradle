@@ -30,6 +30,10 @@ description = 'A Very Simple Git Plugin'
 
 dependencies {
     compile 'org.jenkins-ci.main:jenkins-core:1.609.1'
+    compile 'commons-codec:commons-codec:1.10'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.8.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.1'
 }
 
 jenkinsPlugin {
