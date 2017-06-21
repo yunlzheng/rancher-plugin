@@ -27,7 +27,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     public static final String UPGRADED = "upgraded";
     public static final String ACTIVE = "active";
-    public static final String ACTIVE1 = "active";
 
     private final String environmentId;
     private final String endpoint;
@@ -69,10 +68,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             throw new AbortException("error happen when stack services");
         }
 
-        Optional<Service> serviceOptional = services.get().getData().stream().filter(service1 -> service1.getName().equals(serviceField.getServiceName())).findAny();
-        if (serviceOptional.isPresent()) {
+        Optional<Service> serviceInstance = services.get().getData().stream().filter(service1 -> service1.getName().equals(serviceField.getServiceName())).findAny();
+        if (serviceInstance.isPresent()) {
             listener.getLogger().println("upgrade service");
-            upgradeService(serviceOptional.get(), dockerUUID);
+            upgradeService(serviceInstance.get(), dockerUUID);
         } else {
             listener.getLogger().println("create service instance");
             createService(stack, serviceField.getServiceName(), dockerUUID);
@@ -89,19 +88,19 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         inServiceStrategy.setLaunchConfig(launchConfig);
         serviceUpgrade.setInServiceStrategy(inServiceStrategy);
-        Optional<Service> service1 = rancherClient.upgradeService(getEnvironmentId(), service.getId(), serviceUpgrade);
-        if (!service1.isPresent()) {
+        Optional<Service> serviceInstance = rancherClient.upgradeService(getEnvironmentId(), service.getId(), serviceUpgrade);
+        if (!serviceInstance.isPresent()) {
             throw new AbortException("upgrade service error");
         }
 
-        waitUntilServiceStateIs(service1.get().getId(), UPGRADED);
+        waitUntilServiceStateIs(serviceInstance.get().getId(), UPGRADED);
 
         if (!confirm) {
             return;
         }
 
-        rancherClient.finishUpgradeService(environmentId, service1.get().getId());
-        waitUntilServiceStateIs(service1.get().getId(), ACTIVE);
+        rancherClient.finishUpgradeService(environmentId, serviceInstance.get().getId());
+        waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE);
     }
 
     private void createService(Stack stack, String serviceName, String dockerUUID) throws IOException {
@@ -110,13 +109,13 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         LaunchConfig launchConfig = new LaunchConfig();
         launchConfig.setImageUuid(dockerUUID);
         service.setLaunchConfig(launchConfig);
-        Optional<Service> service1 = rancherClient.createService(service, getEnvironmentId(), stack.getId());
+        Optional<Service> serviceInstance = rancherClient.createService(service, getEnvironmentId(), stack.getId());
 
-        if (!service1.isPresent()) {
+        if (!serviceInstance.isPresent()) {
             throw new AbortException("upgrade service error");
         }
 
-        waitUntilServiceStateIs(service1.get().getId(), ACTIVE);
+        waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE);
 
     }
 
@@ -129,7 +128,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
                 if (state.equals(targetState)) {
                     break;
                 }
-                System.out.println(state);
                 Thread.sleep(2000);
             }
             if (i <= 0) {
