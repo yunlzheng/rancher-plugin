@@ -42,6 +42,19 @@ Advance config:
 | Public Ports | ports should export by service | 8080:8080,9090:9090 |
 | Environment Variables | service environments | aaa=bbb,ccc=ddd |
 
+## Developing
+
+Start jenkins instance
+
+```
+./gradlew server
+```
+
+Create jenkins hpi  
+
+```
+./gradlew jpi
+```
 
 ## Changelog
 
