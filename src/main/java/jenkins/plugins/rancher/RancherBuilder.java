@@ -135,7 +135,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws IOException {
         listener.getLogger().printf("waiting service state to be %s%n", targetState);
         try {
-            int i = 30;
+            int i = 100;
             while (i-- > 0) {
                 Optional<Service> checkService = rancherClient.service(serviceId);
                 String state = checkService.get().getState();
