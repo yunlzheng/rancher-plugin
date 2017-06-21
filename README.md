@@ -15,6 +15,10 @@ Jenkins Rancher Plugin Support Deploy or Upgrade Service Instance in Rancher.
 * Jenkins 1.609.1 or Higher
 * Rancher should support v2-beta API
 
+### How To Use
+
+Download the latest version of plugin from [releases][https://github.com/yunlzheng/rancher-plugin/releases]. Install plugin throw jenkins web or upload the file to $JENKINS_HOME/plugins/ 
+
 ### Job Config
 
 ![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/snapshot.png)
