@@ -12,11 +12,49 @@ public class LaunchConfig {
     private List<String> ports;
     private String type;
     private boolean stdinOpen = true;
-    private Map<String, Object> environment;
+
     private List<String> dataVolumes;
     private List<String> dataVolumesFrom;
 
+    private String workingDir;
+    private List<String> entryPoint;
+    private List<String> command;
+    private Map<String, Object> environment;
+    private Map<String, String> labels;
+
     private boolean tty = true;
+
+    public List<String> getCommand() {
+        return command;
+    }
+
+    public void setCommand(List<String> command) {
+        this.command = command;
+    }
+
+    public List<String> getEntryPoint() {
+        return entryPoint;
+    }
+
+    public void setEntryPoint(List<String> entryPoint) {
+        this.entryPoint = entryPoint;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Map<String, String> labels) {
+        this.labels = labels;
+    }
+
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public void setWorkingDir(String workingDir) {
+        this.workingDir = workingDir;
+    }
 
     public List<String> getDataVolumes() {
         return dataVolumes;
