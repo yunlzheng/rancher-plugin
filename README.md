@@ -33,7 +33,7 @@ Jenkins Rancher Plugin Support Deploy or Upgrade Service Instance in Rancher.
 
 ## Developing
 
-Start jenkins instance
+Start jenkins server
 
 ```
 ./gradlew server

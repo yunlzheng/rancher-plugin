@@ -72,24 +72,26 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         Optional<Service> serviceInstance = services.get().getData().stream().filter(service1 -> service1.getName().equals(serviceField.getServiceName())).findAny();
         if (serviceInstance.isPresent()) {
-            listener.getLogger().println("Upgrading service instance");
 
-            upgradeService(serviceInstance.get(), dockerUUID);
+            upgradeService(serviceInstance.get(), dockerUUID, listener);
         } else {
-            listener.getLogger().println("Creating service instance");
-            createService(stack, serviceField.getServiceName(), dockerUUID);
+
+            createService(stack, serviceField.getServiceName(), dockerUUID, listener);
         }
 
     }
 
-    private void checkServiceState(Service serviceInstance) throws AbortException {
-        if (INACTIVE.equalsIgnoreCase(serviceInstance.getState()) || ACTIVE.equalsIgnoreCase(serviceInstance.getState())) {
+    private void checkServiceState(Service service, TaskListener listener) throws AbortException {
+        String state = service.getState();
+        listener.getLogger().printf("service %s current state is %s%n", service.getName(), state);
+        if (!(INACTIVE.equalsIgnoreCase(state) || ACTIVE.equalsIgnoreCase(state))) {
             throw new AbortException("Before upgrade service the service instance state should be 'inactive' or 'active'");
         }
     }
 
-    private void upgradeService(Service service, String dockerUUID) throws IOException {
-        checkServiceState(service);
+    private void upgradeService(Service service, String dockerUUID, TaskListener listener) throws IOException {
+        listener.getLogger().println("Upgrading service instance");
+        checkServiceState(service, listener);
         ServiceUpgrade serviceUpgrade = new ServiceUpgrade();
         InServiceStrategy inServiceStrategy = new InServiceStrategy();
 
@@ -103,17 +105,18 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             throw new AbortException("upgrade service error");
         }
 
-        waitUntilServiceStateIs(serviceInstance.get().getId(), UPGRADED);
+        waitUntilServiceStateIs(serviceInstance.get().getId(), UPGRADED, listener);
 
         if (!confirm) {
             return;
         }
 
         rancherClient.finishUpgradeService(environmentId, serviceInstance.get().getId());
-        waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE);
+        waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE, listener);
     }
 
-    private void createService(Stack stack, String serviceName, String dockerUUID) throws IOException {
+    private void createService(Stack stack, String serviceName, String dockerUUID, TaskListener listener) throws IOException {
+        listener.getLogger().println("Creating service instance");
         Service service = new Service();
         service.setName(serviceName);
         LaunchConfig launchConfig = new LaunchConfig();
@@ -125,17 +128,19 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             throw new AbortException("upgrade service error");
         }
 
-        waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE);
+        waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE, listener);
 
     }
 
-    private void waitUntilServiceStateIs(String serviceId, String targetState) throws IOException {
+    private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws IOException {
+        listener.getLogger().printf("waiting service state to be %s%n", targetState);
         try {
             int i = 30;
             while (i-- > 0) {
                 Optional<Service> checkService = rancherClient.service(serviceId);
                 String state = checkService.get().getState();
                 if (state.equals(targetState)) {
+                    listener.getLogger().printf("current service state is %s%n", targetState);
                     break;
                 }
                 Thread.sleep(2000);
