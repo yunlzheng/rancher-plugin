@@ -3,6 +3,7 @@ package jenkins.plugins.rancher.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LaunchConfig {
@@ -11,8 +12,35 @@ public class LaunchConfig {
     private List<String> ports;
     private String type;
     private boolean stdinOpen = true;
+    private Map<String, Object> environment;
+    private List<String> dataVolumes;
+    private List<String> dataVolumesFrom;
 
     private boolean tty = true;
+
+    public List<String> getDataVolumes() {
+        return dataVolumes;
+    }
+
+    public void setDataVolumes(List<String> dataVolumes) {
+        this.dataVolumes = dataVolumes;
+    }
+
+    public List<String> getDataVolumesFrom() {
+        return dataVolumesFrom;
+    }
+
+    public void setDataVolumesFrom(List<String> dataVolumesFrom) {
+        this.dataVolumesFrom = dataVolumesFrom;
+    }
+
+    public Map<String, Object> getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Map<String, Object> environment) {
+        this.environment = environment;
+    }
 
     public boolean isStdinOpen() {
         return stdinOpen;

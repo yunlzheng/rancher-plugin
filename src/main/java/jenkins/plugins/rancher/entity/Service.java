@@ -5,7 +5,7 @@ public class Service extends Resource {
 
     private String name;
 
-    private int scale;
+    private int scale = 1;
 
     private String stackId;
 
