@@ -1,16 +1,15 @@
-
 buildscript {
-     repositories {
-         // The plugin is currently only available via the Jenkins
-         // Maven repository, but has dependencies in Maven Central.
-         mavenCentral()
-         maven {
-             url 'http://repo.jenkins-ci.org/releases/'
-         }
-     }
-     dependencies {
-         classpath 'org.jenkins-ci.tools:gradle-jpi-plugin:0.14.1'
-     }
+    repositories {
+        // The plugin is currently only available via the Jenkins
+        // Maven repository, but has dependencies in Maven Central.
+        mavenCentral()
+        maven {
+            url 'http://repo.jenkins-ci.org/releases/'
+        }
+    }
+    dependencies {
+        classpath 'org.jenkins-ci.tools:gradle-jpi-plugin:0.14.1'
+    }
 }
 
 
@@ -21,13 +20,17 @@ repositories {
     jcenter()
     mavenCentral()
     maven {
-      url "http://repo.jenkins-ci.org/releases/"
+        url "http://repo.jenkins-ci.org/releases/"
     }
 }
 
 group = 'org.jenkins-ci.plugins'
 version = '0.1.0-SNAPSHOT'
 description = 'A Very Simple Git Plugin'
+
+dependencies {
+    compile 'org.jenkins-ci.main:jenkins-core:1.609.1'
+}
 
 jenkinsPlugin {
     // version of Jenkins core this plugin depends on, must be 1.420 or later
@@ -82,7 +85,7 @@ jenkinsPlugin {
     developers {
         developer {
             id 'yunlzheng'
-            name 'yunlzheng'
+            name '''yunlzheng'''
             email 'yunl.zheng@gmail.com'
         }
     }
