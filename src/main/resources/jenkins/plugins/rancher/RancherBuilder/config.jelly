@@ -7,7 +7,7 @@
        <f:textbox />
      </f:entry>
      <f:entry title="${%rancher.secretKey}" field="secretKey">
-       <f:textbox />
+       <f:password />
      </f:entry>
       <f:entry title="${%rancher.environmentId}" field="environmentId">
         <f:textbox />
