@@ -26,10 +26,10 @@ repositories {
 
 group = 'org.jenkins-ci.plugins'
 version = '0.1.1-SNAPSHOT'
-description = 'A Very Simple Git Plugin'
+description = 'rancher plugin'
 
 dependencies {
-    compile 'org.jenkins-ci.main:jenkins-core:1.609.1'
+    compile 'org.jenkins-ci.main:jenkins-core:2.11'
     compile 'commons-codec:commons-codec:1.10'
     compile 'com.fasterxml.jackson.core:jackson-core:2.8.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
@@ -38,10 +38,10 @@ dependencies {
 
 jenkinsPlugin {
     // version of Jenkins core this plugin depends on, must be 1.420 or later
-    coreVersion = '1.609.1'
+    coreVersion = '2.11'
 
     // ID of the plugin, defaults to the project name without trailing '-plugin'
-    shortName = 'rancher-plugin'
+    shortName = 'rancher'
 
     // human-readable name of plugin
     displayName = 'Rancher Plugin'
@@ -71,7 +71,7 @@ jenkinsPlugin {
     // snapshotRepoUrl = 'http://maven.jenkins-ci.org:8081/content/repositories/snapshots'
 
     // enable injection of additional tests for checking the syntax of Jelly and other things
-    disabledTestInjection = false
+    disabledTestInjection = true
 
     // the output directory for the localizer task relative to the project root, defaults to the value shown
     localizerOutputDir = "${project.buildDir}/generated-src/localizer"

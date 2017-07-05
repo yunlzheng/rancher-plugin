@@ -1,0 +1,11 @@
+machine:
+  java:
+    version: openjdk8
+
+dependencies:
+  override:
+    - ./gradlew build
+
+test:
+  override:
+    - ./gradlew test

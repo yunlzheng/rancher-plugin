@@ -11,13 +11,13 @@ import java.util.Optional;
 
 
 /**
- * Note: 获取资源API
+ * Rancher API client
  */
 public class RancherClient extends HttpClient {
 
 
     /**
-     * 获取Rancher Client实例对象
+     * Get client instance
      *
      * @param endpoint:  rancher account key api address
      * @param accesskey: rancher account accesskey
@@ -53,10 +53,6 @@ public class RancherClient extends HttpClient {
         return Optional.ofNullable(post(String.format("/projects/%s/services/%s/?action=upgrade", environmentId, serviceId), serviceUpgrade, Service.class));
     }
 
-
-    public Optional<Service> rollbackService(String environmentId, String serviceId) throws IOException {
-        return Optional.ofNullable(post(String.format("/projects/%s/services/%s/?action=rollback", environmentId, serviceId), Service.class));
-    }
 
     public Optional<Service> finishUpgradeService(String environmentId, String serviceId) throws IOException {
         return Optional.ofNullable(post(String.format("/projects/%s/services/%s/?action=finishupgrade", environmentId, serviceId), Service.class));
