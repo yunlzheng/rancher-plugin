@@ -1,6 +1,8 @@
 Jenkins Rancher Plugin
 ======================
 
+[![CircleCI](https://circleci.com/gh/yunlzheng/rancher-plugin.svg?style=svg)](https://circleci.com/gh/yunlzheng/rancher-plugin)
+
 Rancher is an open source software platform that enables organizations to run containers in production. With Rancher, organizations no longer have to build a container services platform from scratch using a distinct set of open source technologies. Rancher supplies the entire software stack needed to manage containers in production.
 
 You can learn more on the [Rancher Website/](http://rancher.com/)
