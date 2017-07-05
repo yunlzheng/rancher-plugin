@@ -1,12 +1,14 @@
 package jenkins.plugins.rancher;
 
 
+import com.google.common.base.Strings;
 import hudson.*;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import hudson.util.FormValidation;
 import jenkins.plugins.rancher.action.InServiceStrategy;
 import jenkins.plugins.rancher.action.ServiceUpgrade;
 import jenkins.plugins.rancher.entity.*;
@@ -15,10 +17,14 @@ import jenkins.plugins.rancher.util.ServiceField;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
+import javax.servlet.ServletException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -79,6 +85,36 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             createService(stack, serviceField.getServiceName(), dockerUUID, listener);
         }
 
+    }
+
+    public FormValidation doCheckEndpoint(@QueryParameter String value) throws IOException, ServletException {
+        try {
+            new URL(value);
+            return FormValidation.ok();
+        } catch (MalformedURLException e) {
+            return FormValidation.error("Not a rancher v2 api endpoint");
+        }
+    }
+
+    public FormValidation doCheckAccessKey(@QueryParameter String value) throws IOException, ServletException {
+        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("AccessKey can't be empty");
+    }
+
+    public FormValidation doCheckSecretKey(@QueryParameter String value) throws IOException, ServletException {
+        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("SecretKey can't be empty");
+    }
+
+    public FormValidation doCheckEnvironmentId(@QueryParameter String value) throws IOException, ServletException {
+        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("EnvironmentId can't be empty");
+    }
+
+    public FormValidation doCheckService(@QueryParameter String value) throws IOException, ServletException {
+        boolean validate = !Strings.isNullOrEmpty(value) && value.indexOf("/") != -1 && value.split("/").length != 2;
+        return validate ? FormValidation.ok() : FormValidation.error("Service name should be like stack/service");
+    }
+
+    public FormValidation doCheckImage(@QueryParameter String value) throws IOException, ServletException {
+        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("Docker image can't be empty");
     }
 
     private void checkServiceState(Service service, TaskListener listener) throws AbortException {
