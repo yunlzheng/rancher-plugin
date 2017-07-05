@@ -117,6 +117,25 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("Docker image can't be empty");
     }
 
+    public FormValidation doTestConnection(
+            @QueryParameter("endpoint") final String endpoint,
+            @QueryParameter("environmentId") final String environmentId,
+            @QueryParameter("accessKey") final String accessKey,
+            @QueryParameter("secretKey") final String secretKey
+    ) throws IOException, ServletException {
+
+        try {
+            RancherClient client = new RancherClient(endpoint, accessKey, secretKey);
+            Optional<Environment> environment = client.environment(environmentId);
+            if (!environment.isPresent()) {
+                return FormValidation.error("Environment [" + environmentId + "] not found please check configuration");
+            }
+            return FormValidation.ok("Connection Success");
+        } catch (Exception e) {
+            return FormValidation.error("Client error : " + e.getMessage());
+        }
+    }
+
     private void checkServiceState(Service service, TaskListener listener) throws AbortException {
         String state = service.getState();
         listener.getLogger().printf("service %s current state is %s%n", service.getName(), state);

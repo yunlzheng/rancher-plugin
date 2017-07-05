@@ -1,10 +1,7 @@
 package jenkins.plugins.rancher;
 
 import jenkins.plugins.rancher.action.ServiceUpgrade;
-import jenkins.plugins.rancher.entity.Service;
-import jenkins.plugins.rancher.entity.Services;
-import jenkins.plugins.rancher.entity.Stack;
-import jenkins.plugins.rancher.entity.Stacks;
+import jenkins.plugins.rancher.entity.*;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -25,6 +22,10 @@ public class RancherClient extends HttpClient {
      */
     public RancherClient(String endpoint, String accesskey, String secretKey) {
         super(endpoint, accesskey, secretKey);
+    }
+
+    public Optional<Environment> environment(String environmentId) throws IOException {
+        return Optional.ofNullable(get("/projects/" + environmentId, Environment.class));
     }
 
     public Optional<Stacks> stacks(String environmentId) throws IOException {
