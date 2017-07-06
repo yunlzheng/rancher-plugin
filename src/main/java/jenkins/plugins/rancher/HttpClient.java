@@ -11,8 +11,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.Charset;
 
 public abstract class HttpClient {
@@ -59,7 +58,16 @@ public abstract class HttpClient {
             method.addRequestHeader("Authorization", getAuthorization());
             method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, false));
             int statusCode = new org.apache.commons.httpclient.HttpClient().executeMethod(method);
-            String responseBody = new String(method.getResponseBody());
+
+            InputStream resStream = method.getResponseBodyAsStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(resStream));
+            StringBuilder resBuffer = new StringBuilder();
+            String resTemp;
+            while ((resTemp = br.readLine()) != null) {
+                resBuffer.append(resTemp);
+            }
+            String responseBody = resBuffer.toString();
+
             if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_ACCEPTED && statusCode != HttpStatus.SC_CREATED) {
                 throw new RuntimeException(String.format("Some Error Happen statusCode %d response: %s", statusCode, responseBody));
             }
