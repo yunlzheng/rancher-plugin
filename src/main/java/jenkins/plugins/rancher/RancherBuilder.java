@@ -87,54 +87,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     }
 
-    public FormValidation doCheckEndpoint(@QueryParameter String value) throws IOException, ServletException {
-        try {
-            new URL(value);
-            return FormValidation.ok();
-        } catch (MalformedURLException e) {
-            return FormValidation.error("Not a rancher v2 api endpoint");
-        }
-    }
-
-    public FormValidation doCheckAccessKey(@QueryParameter String value) throws IOException, ServletException {
-        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("AccessKey can't be empty");
-    }
-
-    public FormValidation doCheckSecretKey(@QueryParameter String value) throws IOException, ServletException {
-        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("SecretKey can't be empty");
-    }
-
-    public FormValidation doCheckEnvironmentId(@QueryParameter String value) throws IOException, ServletException {
-        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("EnvironmentId can't be empty");
-    }
-
-    public FormValidation doCheckService(@QueryParameter String value) throws IOException, ServletException {
-        boolean validate = !Strings.isNullOrEmpty(value) && value.indexOf("/") != -1 && value.split("/").length != 2;
-        return validate ? FormValidation.ok() : FormValidation.error("Service name should be like stack/service");
-    }
-
-    public FormValidation doCheckImage(@QueryParameter String value) throws IOException, ServletException {
-        return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("Docker image can't be empty");
-    }
-
-    public FormValidation doTestConnection(
-            @QueryParameter("endpoint") final String endpoint,
-            @QueryParameter("environmentId") final String environmentId,
-            @QueryParameter("accessKey") final String accessKey,
-            @QueryParameter("secretKey") final String secretKey
-    ) throws IOException, ServletException {
-
-        try {
-            RancherClient client = new RancherClient(endpoint, accessKey, secretKey);
-            Optional<Environment> environment = client.environment(environmentId);
-            if (!environment.isPresent()) {
-                return FormValidation.error("Environment [" + environmentId + "] not found please check configuration");
-            }
-            return FormValidation.ok("Connection Success");
-        } catch (Exception e) {
-            return FormValidation.error("Client error : " + e.getMessage());
-        }
-    }
 
     private void checkServiceState(Service service, TaskListener listener) throws AbortException {
         String state = service.getState();
@@ -311,6 +263,55 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             save();
             return super.configure(req, formData);
+        }
+
+        public FormValidation doCheckEndpoint(@QueryParameter String value) {
+            try {
+                new URL(value);
+                return FormValidation.ok();
+            } catch (MalformedURLException e) {
+                return FormValidation.error("Not a rancher v2 api endpoint");
+            }
+        }
+
+        public FormValidation doCheckAccessKey(@QueryParameter String value) {
+            return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("AccessKey can't be empty");
+        }
+
+        public FormValidation doCheckSecretKey(@QueryParameter String value) {
+            return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("SecretKey can't be empty");
+        }
+
+        public FormValidation doCheckEnvironmentId(@QueryParameter String value) {
+            return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("EnvironmentId can't be empty");
+        }
+
+        public FormValidation doCheckService(@QueryParameter String value) {
+            boolean validate = !Strings.isNullOrEmpty(value) && value.contains("/") && value.split("/").length == 2;
+            return validate ? FormValidation.ok() : FormValidation.error("Service name should be like stack/service");
+        }
+
+        public FormValidation doCheckImage(@QueryParameter String value) {
+            return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("Docker image can't be empty");
+        }
+
+        public FormValidation doTestConnection(
+                @QueryParameter("endpoint") final String endpoint,
+                @QueryParameter("environmentId") final String environmentId,
+                @QueryParameter("accessKey") final String accessKey,
+                @QueryParameter("secretKey") final String secretKey
+        ) throws IOException, ServletException {
+
+            try {
+                RancherClient client = new RancherClient(endpoint, accessKey, secretKey);
+                Optional<Environment> environment = client.environment(environmentId);
+                if (!environment.isPresent()) {
+                    return FormValidation.error("Environment [" + environmentId + "] not found please check configuration");
+                }
+                return FormValidation.ok("Connection Success");
+            } catch (Exception e) {
+                return FormValidation.error("Client error : " + e.getMessage());
+            }
         }
 
     }

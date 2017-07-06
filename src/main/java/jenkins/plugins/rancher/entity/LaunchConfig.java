@@ -2,6 +2,8 @@ package jenkins.plugins.rancher.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import java.util.Map;
 public class LaunchConfig {
     private String imageUuid;
     private String kind;
-    private List<String> ports;
+    private List<String> ports = new ArrayList<>();
     private String type;
     private boolean stdinOpen = true;
 
@@ -19,8 +21,8 @@ public class LaunchConfig {
     private String workingDir;
     private List<String> entryPoint;
     private List<String> command;
-    private Map<String, Object> environment;
-    private Map<String, String> labels;
+    private Map<String, Object> environment = new HashMap<>();
+    private Map<String, String> labels = new HashMap<>();
 
     private boolean tty = true;
 

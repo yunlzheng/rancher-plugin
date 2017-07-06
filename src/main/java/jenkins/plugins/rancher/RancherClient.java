@@ -12,7 +12,6 @@ import java.util.Optional;
  */
 public class RancherClient extends HttpClient {
 
-
     /**
      * Get client instance
      *
@@ -49,15 +48,12 @@ public class RancherClient extends HttpClient {
         return Optional.ofNullable(post(String.format("/projects/%s/service", environmentId), service, Service.class));
     }
 
-
     public Optional<Service> upgradeService(String environmentId, String serviceId, ServiceUpgrade serviceUpgrade) throws IOException {
         return Optional.ofNullable(post(String.format("/projects/%s/services/%s/?action=upgrade", environmentId, serviceId), serviceUpgrade, Service.class));
     }
 
-
     public Optional<Service> finishUpgradeService(String environmentId, String serviceId) throws IOException {
         return Optional.ofNullable(post(String.format("/projects/%s/services/%s/?action=finishupgrade", environmentId, serviceId), Service.class));
     }
-
 
 }
