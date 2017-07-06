@@ -2,10 +2,6 @@ machine:
   java:
     version: openjdk8
 
-dependencies:
-  override:
-    - ./gradlew build
-
 compile:
   override:
     - ./gradlew build
@@ -13,3 +9,7 @@ compile:
 test:
   override:
     - ./gradlew test
+
+general:
+  artifacts:
+    - "build/libs/*.hpi"
