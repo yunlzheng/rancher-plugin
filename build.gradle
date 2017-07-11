@@ -47,7 +47,7 @@ jenkinsPlugin {
     displayName = 'Rancher Plugin'
 
     // URL for plugin on Jenkins wiki or elsewhere
-    // url = 'http://wiki.jenkins-ci.org/display/JENKINS/Git+Simple+Plugin'
+    url = 'https://wiki.jenkins.io/display/JENKINS/Rancher+Plugin'
 
     // plugin URL on GitHub, optional
     gitHubUrl = 'https://github.com/jenkinsci/rancher-plugin.git'
