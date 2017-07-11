@@ -1,7 +1,7 @@
 node {
 
   stage ('Checkout') {
-    git 'https://github.com/yunlzheng/rancher-plugin.git'
+    git 'https://github.com/jenkinsci/rancher-plugin.git'
   }
 
   stage ('Build') {
