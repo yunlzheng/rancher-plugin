@@ -1,7 +1,7 @@
 Jenkins Rancher Plugin
 ======================
 
-[![CircleCI](https://circleci.com/gh/yunlzheng/rancher-plugin.svg?style=svg)](https://circleci.com/gh/yunlzheng/rancher-plugin)
+[![CircleCI](https://circleci.com/gh/jenkinsci/rancher-plugin.svg?style=svg)](https://circleci.com/gh/jenkinsci/rancher-plugin)
 
 Rancher is an open source software platform that enables organizations to run containers in production. With Rancher, organizations no longer have to build a container services platform from scratch using a distinct set of open source technologies. Rancher supplies the entire software stack needed to manage containers in production.
 
@@ -13,13 +13,12 @@ Jenkins Rancher Plugin Support Deploy or Upgrade Service Instance in Rancher.
 
 ### Requirements
 
-* Java8 or Higher
-* Jenkins 1.609.1 or Higher
+* Jenkins 2.11 or Higher
 * Rancher should support v2-beta API
 
-### How To Use
+### Manual Use
 
-Download the latest version of plugin from [releases][https://github.com/yunlzheng/rancher-plugin/releases]. Install plugin throw jenkins web or upload the file to $JENKINS_HOME/plugins/ 
+Download the latest version of plugin from [releases][https://github.com/jenkinsci/rancher-plugin/releases]. Install plugin throw jenkins web or upload the file to $JENKINS_HOME/plugins/ 
 
 ### Job Config
 

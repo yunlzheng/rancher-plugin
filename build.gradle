@@ -50,7 +50,7 @@ jenkinsPlugin {
     // url = 'http://wiki.jenkins-ci.org/display/JENKINS/Git+Simple+Plugin'
 
     // plugin URL on GitHub, optional
-    gitHubUrl = 'https://github.com/yunlzheng/rancher-plugin'
+    gitHubUrl = 'https://github.com/jenkinsci/rancher-plugin.git'
 
     // use the plugin class loader before the core class loader, defaults to false
     pluginFirstClassLoader = true
