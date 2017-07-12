@@ -1,55 +1,7 @@
 Jenkins Rancher Plugin
 ======================
 
-[![CircleCI](https://circleci.com/gh/jenkinsci/rancher-plugin.svg?style=svg)](https://circleci.com/gh/jenkinsci/rancher-plugin)
+Repository has moved
 
-Rancher is an open source software platform that enables organizations to run containers in production. With Rancher, organizations no longer have to build a container services platform from scratch using a distinct set of open source technologies. Rancher supplies the entire software stack needed to manage containers in production.
-
-You can learn more on the [Rancher Website/](http://rancher.com/)
-
-## General information
-
-Jenkins Rancher Plugin Support Deploy or Upgrade Service Instance in Rancher.
-
-### Requirements
-
-* Jenkins 2.11 or Higher
-* Rancher should support v2-beta API
-
-### Manual Use
-
-Download the latest version of plugin from [releases][https://github.com/jenkinsci/rancher-plugin/releases]. Install plugin throw jenkins web or upload the file to $JENKINS_HOME/plugins/ 
-
-### Job Config
-
-![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/snapshot.png)
-
-|       variable |         description |       example |
-|----------------|---------------------|---------------|
-| API Endpoint   | Rancher Account API Endpoint | http://rancher-server/v2-beta |
-| AccessKey      | Account API Access Key | F39583DE2EB3DABD28B0 |
-| SecretKey      | Account API Secret Key | 2AAHwT3YVXpNT9rMhxSs3egFrwFgKK3c3bYaXK7w |
-| Rancher Environment Id | data2 | 1a5558 |
-| Service Name | Target Service Name | stack/demo |
-| Docker Image | Deploy Image Tag | busybox |
-| Auto Confirm   | auto finish upgrade service  | true |
-| Public Ports | ports should export by service | 8080:8080,9090:9090 |
-| Environment Variables | service environments | aaa=bbb,ccc=ddd |
-
-## Developing
-
-Start jenkins server
-
-```
-./gradlew server
-```
-
-Create jenkins hpi  
-
-```
-./gradlew jpi
-```
-
-## Changelog
-
-* Create version 0.1.0-SNAPSHOT, support deploy/upgrade service
+Please see the canonical repo:
+[https://github.com/jenkinsci/rancher-plugin](https://github.com/jenkinsci/rancher-plugin)
