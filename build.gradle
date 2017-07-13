@@ -29,8 +29,8 @@ repositories {
 
 dependencies {
     compile 'org.jenkins-ci.main:jenkins-core:2.11'
-    compile 'org.jenkins-ci.plugins:credentials:1.25@jar'
-    compile 'org.jenkins-ci.plugins:plain-credentials:1.1@jar'
+    jenkinsPlugins 'org.jenkins-ci.plugins:credentials:2.1.13@jar'
+    optionalJenkinsPlugins 'org.jenkins-ci.plugins:plain-credentials:1.4@jar'
     compile 'commons-codec:commons-codec:1.10'
     compile 'com.fasterxml.jackson.core:jackson-core:2.8.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
