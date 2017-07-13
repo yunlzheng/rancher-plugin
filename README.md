@@ -14,7 +14,7 @@ You can learn more on the [Rancher Website/](http://rancher.com/)
 * Deploy docker image to Rancher 
 * Upgrade exist service instance in Rancher
 * Support options to finish the upgrade automatically
-* Support build environment variable as docker image tag, e.q busybox:${BUILD_NUMBER}
+* Support build environment variable as docker image tag, e.q. busybox:${BUILD_NUMBER}
 
 ### Potential upcoming features
 

@@ -8,4 +8,8 @@ node {
     sh './gradlew build'
   }
 
+  stage ('Build Plugin') {
+    buildPlugin(platforms: ['linux'], jdkVersions: [8])
+  }
+
 }
