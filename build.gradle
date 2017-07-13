@@ -12,9 +12,12 @@ buildscript {
     }
 }
 
-
 apply plugin: 'java'
 apply plugin: 'org.jenkins-ci.jpi'
+
+group = 'org.jenkins-ci.plugins'
+version = '1.0.0'
+description = 'rancher plugin'
 
 repositories {
     jcenter()
@@ -23,10 +26,6 @@ repositories {
         url "http://repo.jenkins-ci.org/releases/"
     }
 }
-
-group = 'org.jenkins-ci.plugins'
-version = '0.1.1-SNAPSHOT'
-description = 'rancher plugin'
 
 dependencies {
     compile 'org.jenkins-ci.main:jenkins-core:2.11'
@@ -67,10 +66,10 @@ jenkinsPlugin {
     workDir = file('/tmp/jenkins')
 
     // URL used to deploy the plugin, defaults to the value shown
-    // repoUrl = 'http://maven.jenkins-ci.org:8081/content/repositories/releases'
+    repoUrl = 'https://repo.jenkins-ci.org/releases'
 
     // URL used to deploy snapshots of the plugin, defaults to the value shown
-    // snapshotRepoUrl = 'http://maven.jenkins-ci.org:8081/content/repositories/snapshots'
+    snapshotRepoUrl = 'https://repo.jenkins-ci.org/snapshots'
 
     // enable injection of additional tests for checking the syntax of Jelly and other things
     disabledTestInjection = true
@@ -82,7 +81,7 @@ jenkinsPlugin {
     configureRepositories = false
 
     // skip configuration of publications and repositories for the Maven Publishing plugin, defaults to true
-    configurePublishing = false
+    configurePublishing = true
 
     // plugin file extension, either 'jpi' or 'hpi', defaults to 'hpi'
     fileExtension = 'hpi'

@@ -6,10 +6,7 @@ node {
 
   stage ('Build') {
     sh './gradlew build'
-  }
-
-  stage ('Build Plugin') {
-    buildPlugin(platforms: ['linux'], jdkVersions: [8])
+    sh './gradlew jpi'
   }
 
 }
