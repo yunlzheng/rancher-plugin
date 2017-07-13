@@ -1,6 +1,8 @@
 package jenkins.plugins.rancher;
 
 
+import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.google.common.base.Strings;
 import hudson.*;
 import hudson.model.AbstractProject;
@@ -9,9 +11,12 @@ import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.plugins.rancher.action.InServiceStrategy;
 import jenkins.plugins.rancher.action.ServiceUpgrade;
 import jenkins.plugins.rancher.entity.*;
+import jenkins.plugins.rancher.util.CredentialsUtil;
 import jenkins.plugins.rancher.util.Parser;
 import jenkins.plugins.rancher.util.ServiceField;
 import jenkins.tasks.SimpleBuildStep;
@@ -27,6 +32,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,8 +44,8 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     private final String environmentId;
     private final String endpoint;
-    private final String accessKey;
-    private final String secretKey;
+    private final String credentialId;
+
     private final String service;
     private final String image;
     private final boolean confirm;
@@ -49,22 +55,23 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     @DataBoundConstructor
     public RancherBuilder(
-            String environmentId, String endpoint, String accessKey, String secretKey, String service,
+            String environmentId, String endpoint, String credentialId, String service,
             String image, boolean confirm, String ports, String environments) {
         this.environmentId = environmentId;
         this.endpoint = endpoint;
-        this.accessKey = accessKey;
-        this.secretKey = secretKey;
+        this.credentialId = credentialId;
         this.service = service;
         this.image = image;
         this.confirm = confirm;
         this.ports = ports;
         this.environments = environments;
-        rancherClient = new RancherClient(endpoint, accessKey, secretKey);
+
     }
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+
+        this.rancherClient = newRancherClient();
 
         String dockerUUID = String.format("docker:%s", Parser.paraser(image, getBuildEnvs(build, listener)));
         ServiceField serviceField = new ServiceField(this.service);
@@ -79,15 +86,21 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         Optional<Service> serviceInstance = services.get().getData().stream().filter(service1 -> service1.getName().equals(serviceField.getServiceName())).findAny();
         if (serviceInstance.isPresent()) {
-
             upgradeService(serviceInstance.get(), dockerUUID, listener);
         } else {
-
             createService(stack, serviceField.getServiceName(), dockerUUID, listener);
         }
 
     }
 
+    private RancherClient newRancherClient() {
+        Optional<StandardUsernamePasswordCredentials> credential = CredentialsUtil.getCredential(credentialId);
+        if (credential.isPresent()) {
+            return new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
+        } else {
+            return new RancherClient(endpoint);
+        }
+    }
 
     private void checkServiceState(Service service, TaskListener listener) throws AbortException {
         String state = service.getState();
@@ -207,12 +220,9 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         return envs;
     }
 
+
     public String getEnvironmentId() {
         return environmentId;
-    }
-
-    public String getAccessKey() {
-        return accessKey;
     }
 
     public boolean isConfirm() {
@@ -235,12 +245,12 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         return ports;
     }
 
-    public String getSecretKey() {
-        return secretKey;
-    }
-
     public String getService() {
         return service;
+    }
+
+    public String getCredentialId() {
+        return credentialId;
     }
 
     @Symbol("rancher")
@@ -264,6 +274,39 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             save();
             return super.configure(req, formData);
+        }
+
+        public ListBoxModel doFillCredentialIdItems() {
+            if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+                return new ListBoxModel();
+            }
+            List<StandardUsernamePasswordCredentials> credentials = CredentialsUtil.getCredentials();
+            return new StandardUsernameListBoxModel()
+                    .withEmptySelection()
+                    .withAll(credentials);
+        }
+
+        public FormValidation doTestConnection(
+                @QueryParameter("endpoint") final String endpoint,
+                @QueryParameter("environmentId") final String environmentId,
+                @QueryParameter("credentialId") final String credentialId
+        ) throws IOException, ServletException {
+
+            try {
+                Optional<StandardUsernamePasswordCredentials> credential = CredentialsUtil.getCredential(credentialId);
+                RancherClient client = new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
+                Optional<Environment> environment = client.environment(environmentId);
+                if (!environment.isPresent()) {
+                    return FormValidation.error("Environment [" + environmentId + "] not found please check configuration");
+                }
+                return FormValidation.ok("Connection Success");
+            } catch (Exception e) {
+                return FormValidation.error("Client error : " + e.getMessage());
+            }
+        }
+
+        public FormValidation doCheckCredentialId(@QueryParameter String value) {
+            return !Strings.isNullOrEmpty(value) && CredentialsUtil.getCredential(value).isPresent() ? FormValidation.ok() : FormValidation.warning("API key is required when Rancher ACL is enable");
         }
 
         public FormValidation doCheckEndpoint(@QueryParameter String value) {
@@ -294,25 +337,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         public FormValidation doCheckImage(@QueryParameter String value) {
             return !Strings.isNullOrEmpty(value) ? FormValidation.ok() : FormValidation.error("Docker image can't be empty");
-        }
-
-        public FormValidation doTestConnection(
-                @QueryParameter("endpoint") final String endpoint,
-                @QueryParameter("environmentId") final String environmentId,
-                @QueryParameter("accessKey") final String accessKey,
-                @QueryParameter("secretKey") final String secretKey
-        ) throws IOException, ServletException {
-
-            try {
-                RancherClient client = new RancherClient(endpoint, accessKey, secretKey);
-                Optional<Environment> environment = client.environment(environmentId);
-                if (!environment.isPresent()) {
-                    return FormValidation.error("Environment [" + environmentId + "] not found please check configuration");
-                }
-                return FormValidation.ok("Connection Success");
-            } catch (Exception e) {
-                return FormValidation.error("Client error : " + e.getMessage());
-            }
         }
 
     }

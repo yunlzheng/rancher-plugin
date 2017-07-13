@@ -12,6 +12,10 @@ import java.util.Optional;
  */
 public class RancherClient extends HttpClient {
 
+    public RancherClient(String endpoint) {
+        super(endpoint, "", "");
+    }
+
     /**
      * Get client instance
      *
