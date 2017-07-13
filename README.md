@@ -13,11 +13,12 @@ You can learn more on the [Rancher Website/](http://rancher.com/)
 
 * Deploy docker image to Rancher 
 * Upgrade exist service instance in Rancher
-* Support options to finish the upgrade automatically 
+* Support options to finish the upgrade automatically
+* Support build environment variable as docker image tag, e.q busybox:${BUILD_NUMBER}
 
 ### Potential upcoming features
+
 * provision rancher stack with docker-compose and rancher-compose file
-* support add the rancher credential to Jenkins
 
 ## General information
 
@@ -51,25 +52,36 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 7. Save the "Access Key" and "Secret Key" any way you like, we will use it later
 8. You can now close the dialog 
 
+### Add the Rancher API Key to Jenkins:
+
+1. Navigate to your Jenkins instance
+2. Select "Credentials" from the Jenkins sidebar
+3. Choose a credentials domain and click "Add Credentials"
+4. From the "Kind" drop-down, choose "Username with password"
+5. Enter a description for the credential — the actual value is not important
+8. Click "OK" to create the credential
+
+![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/secret_config.png)
+
 ## Per-job configuration
 
 ### Freestyle job configuration
 
 > Deploy or Upgrade Service Instance
 
-
 1. Create a new free-style project
 2. Ensure. via whatever build stepds you need, tha the Docker image you want to deploy to Rancher will be available in the docker registry
 3. Add "Deploy/Upgrade Rancher Service" post-build action
 4. Enter the target Rancher Service API endpoint, e.g 'http://rancher-server/v2-beta'
-5. Enter the Access Key and Secret Key 
+5. Select the credential name from the drop-down list 
 6. Enter the target rancher environment id, e.g '1a5558'
 7. Enter the target service name, e.g 'stack/service'
 8. Enter the docker image name, e.g 'busybox' (image name support current build environment variable like 'busybox:${BUILD_NUMBER}' to support dynamic image tag)
 9. Optionally choose "Auto Confirm" to finish the upgrade automatically
 
-![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/snapshot.png)
+![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/job_config.png)
 
 ## Changelog
 
+* store credentials as Secret
 * support deploy/upgrade service
