@@ -81,7 +81,12 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 
 ![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/job_config.png)
 
-## Changelog
+## Version history
 
-* store credentials as Secret
-* support deploy/upgrade service
+### Version 1.0.0 (July 13, 2017)
+
+* Initial release
+
+### Version 1.0.1 (July 17, 2017)
+
+* Fixed dependencies info missing issue.
