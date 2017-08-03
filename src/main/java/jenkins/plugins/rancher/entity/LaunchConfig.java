@@ -18,6 +18,8 @@ public class LaunchConfig {
     private List<String> dataVolumes;
     private List<String> dataVolumesFrom;
 
+    private LogConfig logConfig;
+
     private String workingDir;
     private List<String> entryPoint;
     private List<String> command;
@@ -128,5 +130,13 @@ public class LaunchConfig {
 
     public void setPorts(List<String> ports) {
         this.ports = ports;
+    }
+
+    public LogConfig getLogConfig() {
+        return logConfig;
+    }
+
+    public void setLogConfig(LogConfig logConfig) {
+        this.logConfig = logConfig;
     }
 }
