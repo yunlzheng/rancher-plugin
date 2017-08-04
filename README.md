@@ -90,3 +90,7 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 ### Version 1.0.1 (July 17, 2017)
 
 * Fixed dependencies info missing issue.
+
+### Version 1.0.2 (August 04 2017)
+
+* Preserves the log config while upgrading a service.
