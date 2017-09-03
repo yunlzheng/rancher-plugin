@@ -22,6 +22,7 @@ import jenkins.plugins.rancher.util.Parser;
 import jenkins.plugins.rancher.util.ServiceField;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -119,6 +120,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         if (!Strings.isNullOrEmpty(ports)) {
             launchConfig.setPorts(Arrays.asList(ports.split(",")));
+            inServiceStrategy.setStartFirst(false);
         }
 
         inServiceStrategy.setLaunchConfig(launchConfig);
@@ -312,8 +314,21 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             }
         }
 
+        public FormValidation doCheckPorts(@QueryParameter String value) {
+            String[] ports = value.split(",");
+            boolean inValid = Arrays.asList(ports)
+                    .stream()
+                    .anyMatch(
+                            port -> Arrays.asList(port.split(":"))
+                                    .stream()
+                                    .anyMatch(part -> !StringUtils.isNumeric(part)));
+            return inValid ? FormValidation.error("Ports config should be like: 8080:8080,8181:8181") : FormValidation.ok();
+        }
+
         public FormValidation doCheckCredentialId(@QueryParameter String value) {
-            return !Strings.isNullOrEmpty(value) && CredentialsUtil.getCredential(value).isPresent() ? FormValidation.ok() : FormValidation.warning("API key is required when Rancher ACL is enable");
+            return !Strings.isNullOrEmpty(value)
+                    && CredentialsUtil.getCredential(value).isPresent()
+                    ? FormValidation.ok() : FormValidation.warning("API key is required when Rancher ACL is enable");
         }
 
         public FormValidation doCheckEndpoint(@QueryParameter String value) {

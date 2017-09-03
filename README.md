@@ -7,7 +7,7 @@ Enables Jenkins to deploy or upgrade Rancher stack service instance
 
 Rancher is an open source software platform that enables organizations to run containers in production. With Rancher, organizations no longer have to build a container services platform from scratch using a distinct set of open source technologies. Rancher supplies the entire software stack needed to manage containers in production.
 
-You can learn more on the [Rancher Website/](http://rancher.com/)
+You can learn more on the [Rancher Website](http://rancher.com/)
 
 ## Features
 
@@ -78,6 +78,7 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 7. Enter the target service name, e.g 'stack/service'
 8. Enter the docker image name, e.g 'busybox' (image name support current build environment variable like 'busybox:${BUILD_NUMBER}' to support dynamic image tag)
 9. Optionally choose "Auto Confirm" to finish the upgrade automatically
+9. Optionally choose "Public Ports" to export service ports. mutil port shoule e split be ",". e.g 8080:80,9191:91
 
 ![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/job_config.png)
 
