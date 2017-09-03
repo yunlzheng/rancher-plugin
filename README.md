@@ -78,7 +78,7 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 7. Enter the target service name, e.g 'stack/service'
 8. Enter the docker image name, e.g 'busybox' (image name support current build environment variable like 'busybox:${BUILD_NUMBER}' to support dynamic image tag)
 9. Optionally choose "Auto Confirm" to finish the upgrade automatically
-9. Optionally choose "Public Ports" to export service ports. mutil port shoule e split be ",". e.g 8080:80,9191:91
+10. Optionally choose "Public Ports" to export service ports. mutil port shoule e split be ",". e.g 8080:80,9191:91
 
 ![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/job_config.png)
 
