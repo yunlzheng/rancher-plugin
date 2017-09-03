@@ -16,6 +16,7 @@ import jenkins.model.Jenkins;
 import jenkins.plugins.rancher.action.InServiceStrategy;
 import jenkins.plugins.rancher.action.ServiceUpgrade;
 import jenkins.plugins.rancher.entity.*;
+import jenkins.plugins.rancher.entity.Stack;
 import jenkins.plugins.rancher.util.CredentialsUtil;
 import jenkins.plugins.rancher.util.Parser;
 import jenkins.plugins.rancher.util.ServiceField;
@@ -31,10 +32,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class RancherBuilder extends Builder implements SimpleBuildStep {
 
@@ -119,6 +117,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         LaunchConfig launchConfig = service.getLaunchConfig();
         launchConfig.setImageUuid(dockerUUID);
 
+        if (!Strings.isNullOrEmpty(ports)) {
+            launchConfig.setPorts(Arrays.asList(ports.split(",")));
+        }
+
         inServiceStrategy.setLaunchConfig(launchConfig);
         serviceUpgrade.setInServiceStrategy(inServiceStrategy);
         Optional<Service> serviceInstance = rancherClient.upgradeService(getEnvironmentId(), service.getId(), serviceUpgrade);
@@ -142,6 +144,11 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         service.setName(serviceName);
         LaunchConfig launchConfig = new LaunchConfig();
         launchConfig.setImageUuid(dockerUUID);
+
+        if (!Strings.isNullOrEmpty(ports)) {
+            launchConfig.setPorts(Arrays.asList(ports.split(",")));
+        }
+
         service.setLaunchConfig(launchConfig);
         Optional<Service> serviceInstance = rancherClient.createService(service, getEnvironmentId(), stack.getId());
 
