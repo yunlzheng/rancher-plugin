@@ -26,11 +26,9 @@
            <f:entry title="${%rancher.ports}" field="ports">
              <f:textbox />
            </f:entry>
-           <!--
            <f:entry title="${%rancher.environments}" field="environments">
             <f:textbox />
            </f:entry>
-           -->
          </f:advanced >
      </f:section>
 

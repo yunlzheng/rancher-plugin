@@ -117,6 +117,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         LaunchConfig launchConfig = service.getLaunchConfig();
         launchConfig.setImageUuid(dockerUUID);
+        launchConfig.getEnvironment().putAll(this.customEnvironments());
 
         if (!Strings.isNullOrEmpty(ports)) {
             launchConfig.setPorts(Arrays.asList(ports.split(",")));
@@ -146,11 +147,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         service.setName(serviceName);
         LaunchConfig launchConfig = new LaunchConfig();
         launchConfig.setImageUuid(dockerUUID);
-
+        launchConfig.setEnvironment(this.customEnvironments());
         if (!Strings.isNullOrEmpty(ports)) {
             launchConfig.setPorts(Arrays.asList(ports.split(",")));
         }
-
         service.setLaunchConfig(launchConfig);
         Optional<Service> serviceInstance = rancherClient.createService(service, getEnvironmentId(), stack.getId());
 
@@ -159,7 +159,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         }
 
         waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE, listener);
-
     }
 
     private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws IOException {
@@ -209,6 +208,18 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         } else {
             return stackOptional.get();
         }
+    }
+
+    private Map<String, Object> customEnvironments() {
+        HashMap<String, Object> map = new HashMap<>();
+        String[] fragments = this.environments.split(",");
+        for (String fragement : fragments) {
+            if (fragement.contains(":")) {
+                String[] env = fragement.split(":");
+                map.put(env[0], env[1]);
+            }
+        }
+        return map;
     }
 
     private boolean isEqual(ServiceField serviceField, Stack stack1) {

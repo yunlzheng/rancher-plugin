@@ -78,7 +78,8 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 7. Enter the target service name, e.g 'stack/service'
 8. Enter the docker image name, e.g 'busybox' (image name support current build environment variable like 'busybox:${BUILD_NUMBER}' to support dynamic image tag)
 9. Optionally choose "Auto Confirm" to finish the upgrade automatically
-10. Optionally choose "Public Ports" to export service ports. mutil port shoule e split be ",". e.g 8080:80,9191:91
+10. Optionally choose "Public Ports" to export service ports. mutil port shoule be split be ",". e.g 8080:80,9191:91
+11. Optionally choose "Environment variables" to config service environment. mutil variable should be split by ",". e.g AAA:aaa,BBB:bbb (Note: The old environment of service will be merge)
 
 ![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/job_config.png)
 
@@ -95,3 +96,11 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 ### Version 1.0.2 (August 04 2017)
 
 * Preserves the log config while upgrading a service.
+
+### Version 1.0.3 (September 03 2017)
+
+* Support export service ports.
+
+### Version 1.0.4 (September 12 2017)
+
+* Support export environment variable.
