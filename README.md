@@ -11,7 +11,7 @@ You can learn more on the [Rancher Website](http://rancher.com/)
 
 ## Features
 
-* Deploy docker image to Rancher 
+* Deploy docker image to Rancher
 * Upgrade exist service instance in Rancher
 * Support options to finish the upgrade automatically
 * Support build environment variable as docker image tag, e.q. busybox:${BUILD_NUMBER}
@@ -50,7 +50,7 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 5. Give the  api key any name and description you like, e.g "Jenkins"
 6. Click the "Create Key"
 7. Save the "Access Key" and "Secret Key" any way you like, we will use it later
-8. You can now close the dialog 
+8. You can now close the dialog
 
 ### Add the Rancher API Key to Jenkins:
 
@@ -73,7 +73,7 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 2. Ensure. via whatever build stepds you need, tha the Docker image you want to deploy to Rancher will be available in the docker registry
 3. Add "Deploy/Upgrade Rancher Service" post-build action
 4. Enter the target Rancher Service API endpoint, e.g 'http://rancher-server/v2-beta'
-5. Select the credential name from the drop-down list 
+5. Select the credential name from the drop-down list
 6. Enter the target rancher environment id, e.g '1a5558'
 7. Enter the target service name, e.g 'stack/service'
 8. Enter the docker image name, e.g 'busybox' (image name support current build environment variable like 'busybox:${BUILD_NUMBER}' to support dynamic image tag)
@@ -82,6 +82,24 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 11. Optionally choose "Environment variables" to config service environment. mutil variable should be split by ",". e.g AAA:aaa,BBB:bbb (Note: The old environment of service will be merge)
 
 ![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/job_config.png)
+
+## Development Testing
+
+For your convenience, this repository includes a docker-compose configuration
+for running jenkins, rancher-server, and a rancher agent. It also includes a
+bootstrapping script which will configure a Rancher service and Jenkins job
+using the plugin from `build/libs/rancher.hpi`. To use this test harness simply
+run the following:
+
+```
+./gradlew jpi
+cd test/
+docker-compose up -d --build
+```
+
+Rancher, Jenkins, and an Echo Server will be run on ports 8080, 8081, and 8082
+respectively. You can simply visit the jenkins web UI and run the "test" job to
+test the plugin.
 
 ## Version history
 

@@ -18,6 +18,11 @@ public class LaunchConfig {
     private List<String> dataVolumes;
     private List<String> dataVolumesFrom;
 
+    private InstanceHealthCheck healthCheck;
+    private String[] healthCmd;
+    private int healthInterval;
+    private int healthRetries;
+    private int healthTimeout;
     private LogConfig logConfig;
 
     private String workingDir;
@@ -27,6 +32,46 @@ public class LaunchConfig {
     private Map<String, String> labels = new HashMap<>();
 
     private boolean tty = true;
+
+    public InstanceHealthCheck getHealthCheck() {
+        return healthCheck;
+    }
+
+    public void setHealthCheck(InstanceHealthCheck healthCheck) {
+        this.healthCheck = healthCheck;
+    }
+
+    public String[] getHealthCmd() {
+        return healthCmd;
+    }
+
+    public void setHealthCmd(String[] healthCmd) {
+        this.healthCmd = healthCmd;
+    }
+
+    public int getHealthInterval() {
+        return healthInterval;
+    }
+
+    public void setHealthInterval(int healthInterval) {
+        this.healthInterval = healthInterval;
+    }
+
+    public int getHealthRetries() {
+        return healthRetries;
+    }
+
+    public void setHealthRetries(int healthRetries) {
+        this.healthRetries = healthRetries;
+    }
+
+    public int getHealthTimeout() {
+        return healthTimeout;
+    }
+
+    public void setHealthTimeout(int healthTimeout) {
+        this.healthTimeout = healthTimeout;
+    }
 
     public List<String> getCommand() {
         return command;

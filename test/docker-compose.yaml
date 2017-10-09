@@ -1,0 +1,25 @@
+version: '3'
+services:
+  rancher-server:
+    image: "rancher/server:stable"
+    ports:
+    - "8080:8080"
+  jenkins:
+    build: "./jenkins"
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+    ports:
+    - "8081:8080"
+    - "50000:50000"
+    volumes:
+    - "../build/libs/rancher.hpi:/usr/share/jenkins/ref/plugins/rancher.jpi"
+  rancher-node:
+    image: "rancher/agent"
+    entrypoint: /entrypoint.py
+    privileged: true
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./rancher-agent/entrypoint.py:/entrypoint.py
+    links:
+    - rancher-server
+    - jenkins
