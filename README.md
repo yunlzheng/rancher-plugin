@@ -122,3 +122,7 @@ test the plugin.
 ### Version 1.0.4 (September 12 2017)
 
 * Support export environment variable.
+
+### Version 1.0.5 (October 10 2017)
+
+* Support health check serialization.
