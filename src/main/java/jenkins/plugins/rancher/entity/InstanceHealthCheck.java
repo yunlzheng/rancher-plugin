@@ -1,8 +1,10 @@
 package jenkins.plugins.rancher.entity;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InstanceHealthCheck {
+    private int initializingTimeout;
     private int healthyThreshold;
     private int interval;
     private String name;
@@ -13,6 +15,14 @@ public class InstanceHealthCheck {
     private String strategy;
     private int unhealthyThreshold;
     private RecreateOnQuorumStrategyConfig recreateOnQuorumStrategyConfig;
+
+    public int getInitializingTimeout() {
+        return initializingTimeout;
+    }
+
+    public void setInitializingTimeout(int initializingTimeout) {
+        this.initializingTimeout = initializingTimeout;
+    }
 
     public RecreateOnQuorumStrategyConfig getRecreateOnQuorumStrategyConfig() {
         return recreateOnQuorumStrategyConfig;
