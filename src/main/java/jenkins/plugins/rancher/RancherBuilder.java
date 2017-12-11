@@ -17,7 +17,9 @@ import jenkins.plugins.rancher.action.InServiceStrategy;
 import jenkins.plugins.rancher.action.ServiceUpgrade;
 import jenkins.plugins.rancher.entity.*;
 import jenkins.plugins.rancher.entity.Stack;
-import jenkins.plugins.rancher.util.*;
+import jenkins.plugins.rancher.util.CredentialsUtil;
+import jenkins.plugins.rancher.util.Parser;
+import jenkins.plugins.rancher.util.ServiceField;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +40,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     public static final String UPGRADED = "upgraded";
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
+    public static final int DEFAULT_TIMEOUT = 10;
 
     private final String environmentId;
     private final String endpoint;
@@ -74,9 +77,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         Map<String, String> buildEnvironments = getBuildEnvs(build, listener);
         String dockerUUID = String.format("docker:%s", Parser.paraser(image, buildEnvironments));
         Map<String, Object> environments = this.customEnvironments(Parser.paraser(this.environments, buildEnvironments));
-        ServiceField serviceField = new ServiceField(Parser.paraser(this.service, buildEnvironments));
+        String service = Parser.paraser(this.service, buildEnvironments);
+        ServiceField serviceField = new ServiceField(service);
 
-        listener.getLogger().printf("Deploy/Upgrade image[%s] to service [%s] to rancher environment [%s/projects/%s]%n", dockerUUID, getService(), endpoint, getEnvironmentId());
+        listener.getLogger().printf("Deploy/Upgrade image[%s] to service [%s] to rancher environment [%s/projects/%s]%n", dockerUUID, service, endpoint, getEnvironmentId());
 
         Stack stack = getStack(listener, serviceField, rancherClient);
         Optional<Services> services = rancherClient.services(stack.getId());
@@ -164,11 +168,11 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws IOException {
         int timeoutMs = 1000 * timeout;
-        listener.getLogger().printf("waiting service state to be %s%n (timeout:%s)", targetState, timeout);
-        TimeoutThread timeout = new TimeoutThread(timeoutMs);
+        long start = System.currentTimeMillis();
+        long current = System.currentTimeMillis();
+        listener.getLogger().printf("waiting service state to be %s (timeout:%ss)", targetState, timeout);
         try {
-            timeout.start();
-            while (true) {
+            while ((current - start) < timeoutMs) {
                 Optional<Service> checkService = rancherClient.service(serviceId);
                 String state = checkService.get().getState();
                 if (state.equals(targetState)) {
@@ -176,9 +180,8 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
                     break;
                 }
                 Thread.sleep(2000);
+                current = System.currentTimeMillis();
             }
-            timeout.cancel();
-        } catch (TimeoutException e) {
             throw new AbortException("Timeout(" + timeout + "s) to wait service state to " + targetState);
         } catch (Exception e) {
             throw new AbortException("Exception happened to wait service state with message:" + e.getMessage());
@@ -276,7 +279,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     }
 
     public int getTimeout() {
-        return timeout;
+        return timeout == 0 ? DEFAULT_TIMEOUT : timeout;
     }
 
     @Symbol("rancher")
@@ -329,6 +332,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             } catch (Exception e) {
                 return FormValidation.error("Client error : " + e.getMessage());
             }
+        }
+
+        public FormValidation doCheckTimeout(@QueryParameter int value) {
+            return value > 0 ? FormValidation.ok() : FormValidation.error("Time should be at least 1");
         }
 
         public FormValidation doCheckPorts(@QueryParameter String value) {
