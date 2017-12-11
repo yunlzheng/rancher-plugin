@@ -71,12 +71,14 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         this.rancherClient = newRancherClient();
 
-        String dockerUUID = String.format("docker:%s", Parser.paraser(image, getBuildEnvs(build, listener)));
-        ServiceField serviceField = new ServiceField(this.service);
+        Map<String, String> buildEnvironments = getBuildEnvs(build, listener);
+        String dockerUUID = String.format("docker:%s", Parser.paraser(image, buildEnvironments));
+        Map<String, Object> environments = this.customEnvironments(Parser.paraser(this.environments, buildEnvironments));
+        ServiceField serviceField = new ServiceField(Parser.paraser(this.service, buildEnvironments));
+
         listener.getLogger().printf("Deploy/Upgrade image[%s] to service [%s] to rancher environment [%s/projects/%s]%n", dockerUUID, getService(), endpoint, getEnvironmentId());
 
         Stack stack = getStack(listener, serviceField, rancherClient);
-
         Optional<Services> services = rancherClient.services(stack.getId());
         if (!services.isPresent()) {
             throw new AbortException("Error happen when fetch stack<" + stack.getName() + "> services");
@@ -84,9 +86,9 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         Optional<Service> serviceInstance = services.get().getData().stream().filter(service1 -> service1.getName().equals(serviceField.getServiceName())).findAny();
         if (serviceInstance.isPresent()) {
-            upgradeService(serviceInstance.get(), dockerUUID, listener);
+            upgradeService(serviceInstance.get(), dockerUUID, listener, environments);
         } else {
-            createService(stack, serviceField.getServiceName(), dockerUUID, listener);
+            createService(stack, serviceField.getServiceName(), dockerUUID, listener, environments);
         }
 
     }
@@ -108,7 +110,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         }
     }
 
-    private void upgradeService(Service service, String dockerUUID, TaskListener listener) throws IOException {
+    private void upgradeService(Service service, String dockerUUID, TaskListener listener, Map<String, Object> environments) throws IOException {
         listener.getLogger().println("Upgrading service instance");
         checkServiceState(service, listener);
         ServiceUpgrade serviceUpgrade = new ServiceUpgrade();
@@ -116,7 +118,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         LaunchConfig launchConfig = service.getLaunchConfig();
         launchConfig.setImageUuid(dockerUUID);
-        launchConfig.getEnvironment().putAll(this.customEnvironments());
+        launchConfig.getEnvironment().putAll(environments);
 
         if (!Strings.isNullOrEmpty(ports)) {
             launchConfig.setPorts(Arrays.asList(ports.split(",")));
@@ -140,13 +142,13 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE, listener);
     }
 
-    private void createService(Stack stack, String serviceName, String dockerUUID, TaskListener listener) throws IOException {
+    private void createService(Stack stack, String serviceName, String dockerUUID, TaskListener listener, Map<String, Object> environments) throws IOException {
         listener.getLogger().println("Creating service instance");
         Service service = new Service();
         service.setName(serviceName);
         LaunchConfig launchConfig = new LaunchConfig();
         launchConfig.setImageUuid(dockerUUID);
-        launchConfig.setEnvironment(this.customEnvironments());
+        launchConfig.setEnvironment(environments);
         if (!Strings.isNullOrEmpty(ports)) {
             launchConfig.setPorts(Arrays.asList(ports.split(",")));
         }
@@ -210,9 +212,9 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         }
     }
 
-    private Map<String, Object> customEnvironments() {
+    private Map<String, Object> customEnvironments(String environments) {
         HashMap<String, Object> map = new HashMap<>();
-        String[] fragments = this.environments.split(",");
+        String[] fragments = environments.split(",");
         for (String fragement : fragments) {
             if (fragement.contains(":")) {
                 String[] env = fragement.split(":");
