@@ -17,9 +17,7 @@ import jenkins.plugins.rancher.action.InServiceStrategy;
 import jenkins.plugins.rancher.action.ServiceUpgrade;
 import jenkins.plugins.rancher.entity.*;
 import jenkins.plugins.rancher.entity.Stack;
-import jenkins.plugins.rancher.util.CredentialsUtil;
-import jenkins.plugins.rancher.util.Parser;
-import jenkins.plugins.rancher.util.ServiceField;
+import jenkins.plugins.rancher.util.*;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -50,12 +48,13 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     private final boolean confirm;
     private final String ports;
     private final String environments;
+    private int timeout = 50;
     private RancherClient rancherClient;
 
     @DataBoundConstructor
     public RancherBuilder(
             String environmentId, String endpoint, String credentialId, String service,
-            String image, boolean confirm, String ports, String environments) {
+            String image, boolean confirm, String ports, String environments, int timeout) {
         this.environmentId = environmentId;
         this.endpoint = endpoint;
         this.credentialId = credentialId;
@@ -64,7 +63,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         this.confirm = confirm;
         this.ports = ports;
         this.environments = environments;
-
+        this.timeout = timeout;
     }
 
     @Override
@@ -162,10 +161,12 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     }
 
     private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws IOException {
-        listener.getLogger().printf("waiting service state to be %s%n", targetState);
+        int timeoutMs = 1000 * timeout;
+        listener.getLogger().printf("waiting service state to be %s%n (timeout:%s)", targetState, timeout);
+        TimeoutThread timeout = new TimeoutThread(timeoutMs);
         try {
-            int i = 100;
-            while (i-- > 0) {
+            timeout.start();
+            while (true) {
                 Optional<Service> checkService = rancherClient.service(serviceId);
                 String state = checkService.get().getState();
                 if (state.equals(targetState)) {
@@ -174,13 +175,12 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
                 }
                 Thread.sleep(2000);
             }
-            if (i <= 0) {
-                throw new AbortException("Service[" + serviceId + "] State not invalidate[" + targetState + "], current state is " + rancherClient.service(serviceId).get().getState());
-            }
+            timeout.cancel();
+        } catch (TimeoutException e) {
+            throw new AbortException("Timeout(" + timeout + "s) to wait service state to " + targetState);
         } catch (Exception e) {
-            throw new AbortException("Timeout to wait service state to " + targetState);
+            throw new AbortException("Exception happened to wait service state with message:" + e.getMessage());
         }
-
     }
 
     private Stack getStack(@Nonnull TaskListener listener, ServiceField serviceField, RancherClient rancherClient) throws IOException {
@@ -271,6 +271,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     public String getCredentialId() {
         return credentialId;
+    }
+
+    public int getTimeout() {
+        return timeout;
     }
 
     @Symbol("rancher")

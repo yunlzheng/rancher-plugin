@@ -29,6 +29,9 @@
            <f:entry title="${%rancher.environments}" field="environments">
             <f:textbox />
            </f:entry>
+           <f:entry title="${%rancher.timeout}" field="timeout">
+            <f:number default="50"/>
+           </f:entry>
          </f:advanced >
      </f:section>
 
