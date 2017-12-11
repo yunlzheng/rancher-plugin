@@ -80,6 +80,7 @@ Or Download the latest version of plugin from [releases][https://github.com/jenk
 9. Optionally choose "Auto Confirm" to finish the upgrade automatically
 10. Optionally choose "Public Ports" to export service ports. mutil port shoule be split be ",". e.g 8080:80,9191:91
 11. Optionally choose "Environment variables" to config service environment. mutil variable should be split by ",". e.g AAA:aaa,BBB:bbb (Note: The old environment of service will be merge)
+12. Optionally choose "Timeout" to config timeout seconds when wait rancher service status change.
 
 ![](http://7pn5d3.com1.z0.glb.clouddn.com//snapshots/rancher-plugin/job_config.png)
 
@@ -126,3 +127,7 @@ test the plugin.
 ### Version 1.0.5 (October 10 2017)
 
 * Support health check serialization.
+
+### Version 1.0.7 (December 11 2017)
+
+* Support custom timeout, and build variable in all fields.
