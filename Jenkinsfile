@@ -5,8 +5,8 @@ node {
   }
 
   stage ('Build') {
-    sh './gradlew build'
-    sh './gradlew jpi'
+    sh 'docker pull dgroup/java8-gradle'
+    sh 'docker run --rm -v ${WORKSPACE}:/code --workdir /code dgroup/java8-gradle ./gradlew jpl'
   }
 
 }
