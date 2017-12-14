@@ -182,7 +182,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
                 Thread.sleep(2000);
                 current = System.currentTimeMillis();
             }
-            throw new AbortException("Timeout(" + timeout + "s) to wait service state to " + targetState);
         } catch (Exception e) {
             throw new AbortException("Exception happened to wait service state with message:" + e.getMessage());
         }
@@ -322,8 +321,13 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         ) throws IOException, ServletException {
 
             try {
+                RancherClient client;
                 Optional<StandardUsernamePasswordCredentials> credential = CredentialsUtil.getCredential(credentialId);
-                RancherClient client = new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
+                if (credential.isPresent()) {
+                    client = new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
+                } else {
+                    client = new RancherClient(endpoint);
+                }
                 Optional<Environment> environment = client.environment(environmentId);
                 if (!environment.isPresent()) {
                     return FormValidation.error("Environment [" + environmentId + "] not found please check configuration");
