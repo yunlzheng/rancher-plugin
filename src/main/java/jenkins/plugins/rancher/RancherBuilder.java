@@ -53,6 +53,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     private final String environments;
     private int timeout = 50;
     private RancherClient rancherClient;
+    private CredentialsUtil credentialsUtil;
 
     @DataBoundConstructor
     public RancherBuilder(
@@ -67,13 +68,28 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         this.ports = ports;
         this.environments = environments;
         this.timeout = timeout;
+        this.credentialsUtil = new CredentialsUtil();
+        this.rancherClient = newRancherClient();
+    }
+
+    public RancherBuilder(String environmentId, String endpoint, String credentialId, String service,
+                          String image, boolean confirm, String ports, String environments, int timeout,
+                          RancherClient rancherClient, CredentialsUtil credentialsUtil) {
+        this.confirm = confirm;
+        this.credentialId = credentialId;
+        this.endpoint = endpoint;
+        this.environmentId = environmentId;
+        this.environments = environments;
+        this.image = image;
+        this.ports = ports;
+        this.service = service;
+        this.timeout = timeout;
+        this.credentialsUtil = credentialsUtil;
+        this.rancherClient = rancherClient;
     }
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-
-        this.rancherClient = newRancherClient();
-
         Map<String, String> buildEnvironments = getBuildEnvs(build, listener);
         String dockerUUID = String.format("docker:%s", Parser.paraser(image, buildEnvironments));
         Map<String, Object> environments = this.customEnvironments(Parser.paraser(this.environments, buildEnvironments));
@@ -97,8 +113,16 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     }
 
+    public void setCredentialsUtil(CredentialsUtil credentialsUtil) {
+        this.credentialsUtil = credentialsUtil;
+    }
+
+    public void setRancherClient(RancherClient rancherClient) {
+        this.rancherClient = rancherClient;
+    }
+
     private RancherClient newRancherClient() {
-        Optional<StandardUsernamePasswordCredentials> credential = CredentialsUtil.getCredential(credentialId);
+        Optional<StandardUsernamePasswordCredentials> credential = credentialsUtil.getCredential(credentialId);
         if (credential.isPresent()) {
             return new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
         } else {
@@ -183,6 +207,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
                 current = System.currentTimeMillis();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new AbortException("Exception happened to wait service state with message:" + e.getMessage());
         }
     }
@@ -204,9 +229,9 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     }
 
     private Stack createStack(ServiceField serviceField, RancherClient rancherClient) throws IOException {
-        Stack stack1 = new Stack();
-        stack1.setName(serviceField.getStackName());
-        Optional<Stack> stackOptional = rancherClient.createStack(stack1, getEnvironmentId());
+        Stack stack = new Stack();
+        stack.setName(serviceField.getStackName());
+        Optional<Stack> stackOptional = rancherClient.createStack(stack, getEnvironmentId());
         if (!stackOptional.isPresent()) {
             throw new AbortException("error happen when create stack");
         } else {
@@ -243,7 +268,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         }
         return envs;
     }
-
 
     public String getEnvironmentId() {
         return environmentId;
@@ -285,6 +309,8 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
+        private static final CredentialsUtil credentialsUtil = new CredentialsUtil();
+
         public DescriptorImpl() {
             load();
         }
@@ -308,7 +334,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
                 return new ListBoxModel();
             }
-            List<StandardUsernamePasswordCredentials> credentials = CredentialsUtil.getCredentials();
+            List<StandardUsernamePasswordCredentials> credentials = credentialsUtil.getCredentials();
             return new StandardUsernameListBoxModel()
                     .withEmptySelection()
                     .withAll(credentials);
@@ -322,7 +348,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
             try {
                 RancherClient client;
-                Optional<StandardUsernamePasswordCredentials> credential = CredentialsUtil.getCredential(credentialId);
+                Optional<StandardUsernamePasswordCredentials> credential = credentialsUtil.getCredential(credentialId);
                 if (credential.isPresent()) {
                     client = new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
                 } else {
@@ -334,7 +360,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
                 }
                 return FormValidation.ok("Connection Success");
             } catch (Exception e) {
-                return FormValidation.error("Client error : " + e.getMessage());
+                return FormValidation.error("Connection fails with message : " + e.getMessage());
             }
         }
 
@@ -355,7 +381,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         public FormValidation doCheckCredentialId(@QueryParameter String value) {
             return !Strings.isNullOrEmpty(value)
-                    && CredentialsUtil.getCredential(value).isPresent()
+                    && credentialsUtil.getCredential(value).isPresent()
                     ? FormValidation.ok() : FormValidation.warning("API key is required when Rancher ACL is enable");
         }
 

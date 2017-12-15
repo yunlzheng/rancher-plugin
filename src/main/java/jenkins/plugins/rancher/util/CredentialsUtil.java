@@ -15,14 +15,14 @@ import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCreden
 
 public class CredentialsUtil {
 
-    public static List<StandardUsernamePasswordCredentials> getCredentials() {
+    public List<StandardUsernamePasswordCredentials> getCredentials() {
         return lookupCredentials(
                 StandardUsernamePasswordCredentials.class,
                 Jenkins.getInstance(),
                 ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
     }
 
-    public static Optional<StandardUsernamePasswordCredentials> getCredential(String credentialId) {
+    public  Optional<StandardUsernamePasswordCredentials> getCredential(String credentialId) {
         List<StandardUsernamePasswordCredentials> standardUsernamePasswordCredentials = getCredentials();
         CredentialsMatcher matcher = CredentialsMatchers.withId(credentialId);
         return Optional.ofNullable(CredentialsMatchers.firstOrNull(standardUsernamePasswordCredentials, matcher));
