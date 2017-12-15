@@ -68,28 +68,20 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         this.ports = ports;
         this.environments = environments;
         this.timeout = timeout;
-        this.credentialsUtil = new CredentialsUtil();
-        this.rancherClient = newRancherClient();
     }
 
-    public RancherBuilder(String environmentId, String endpoint, String credentialId, String service,
-                          String image, boolean confirm, String ports, String environments, int timeout,
-                          RancherClient rancherClient, CredentialsUtil credentialsUtil) {
-        this.confirm = confirm;
-        this.credentialId = credentialId;
-        this.endpoint = endpoint;
-        this.environmentId = environmentId;
-        this.environments = environments;
-        this.image = image;
-        this.ports = ports;
-        this.service = service;
-        this.timeout = timeout;
-        this.credentialsUtil = credentialsUtil;
-        this.rancherClient = rancherClient;
+    protected static RancherBuilder newInstance(String environmentId, String endpoint, String credentialId, String service,
+                                                String image, boolean confirm, String ports, String environments, int timeout,
+                                                RancherClient rancherClient, CredentialsUtil credentialsUtil) {
+        RancherBuilder rancherBuilder = new RancherBuilder(environmentId, endpoint, credentialId, service, image, confirm, ports, environments, timeout);
+        rancherBuilder.setCredentialsUtil(credentialsUtil);
+        rancherBuilder.setRancherClient(rancherClient);
+        return rancherBuilder;
     }
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+        initializeClient();
         Map<String, String> buildEnvironments = getBuildEnvs(build, listener);
         String dockerUUID = String.format("docker:%s", Parser.paraser(image, buildEnvironments));
         Map<String, Object> environments = this.customEnvironments(Parser.paraser(this.environments, buildEnvironments));
@@ -110,8 +102,9 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         } else {
             createService(stack, serviceField.getServiceName(), dockerUUID, listener, environments);
         }
-
     }
+
+
 
     public void setCredentialsUtil(CredentialsUtil credentialsUtil) {
         this.credentialsUtil = credentialsUtil;
@@ -119,6 +112,16 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     public void setRancherClient(RancherClient rancherClient) {
         this.rancherClient = rancherClient;
+    }
+
+    private void initializeClient() {
+        if (credentialsUtil == null) {
+            credentialsUtil = new CredentialsUtil();
+        }
+
+        if (rancherClient == null) {
+            rancherClient = newRancherClient();
+        }
     }
 
     private RancherClient newRancherClient() {
@@ -190,24 +193,28 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         waitUntilServiceStateIs(serviceInstance.get().getId(), ACTIVE, listener);
     }
 
-    private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws IOException {
+    private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws AbortException {
         int timeoutMs = 1000 * timeout;
         long start = System.currentTimeMillis();
         long current = System.currentTimeMillis();
-        listener.getLogger().printf("waiting service state to be %s (timeout:%ss)", targetState, timeout);
+        listener.getLogger().println("waiting service state to be " + targetState + " (timeout:" + timeout + "s)");
         try {
+            boolean success = false;
             while ((current - start) < timeoutMs) {
                 Optional<Service> checkService = rancherClient.service(serviceId);
                 String state = checkService.get().getState();
                 if (state.equals(targetState)) {
-                    listener.getLogger().printf("current service state is %s%n", targetState);
+                    listener.getLogger().println("current service state is " + targetState);
+                    success = true;
                     break;
                 }
                 Thread.sleep(2000);
                 current = System.currentTimeMillis();
             }
+            if (!success) {
+                throw new AbortException("timeout");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new AbortException("Exception happened to wait service state with message:" + e.getMessage());
         }
     }

@@ -4,7 +4,7 @@ machine:
 
 compile:
   override:
-    - ./gradlew build
+    - ./gradlew jpi
 
 test:
   override:
