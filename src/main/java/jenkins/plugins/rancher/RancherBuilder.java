@@ -40,7 +40,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     public static final String UPGRADED = "upgraded";
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
-    public static final int DEFAULT_TIMEOUT = 10;
+    public static final int DEFAULT_TIMEOUT = 50;
 
     private final String environmentId;
     private final String endpoint;
@@ -103,7 +103,6 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             createService(stack, serviceField.getServiceName(), dockerUUID, listener, environments);
         }
     }
-
 
 
     public void setCredentialsUtil(CredentialsUtil credentialsUtil) {
@@ -203,7 +202,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             while ((current - start) < timeoutMs) {
                 Optional<Service> checkService = rancherClient.service(serviceId);
                 String state = checkService.get().getState();
-                if (state.equals(targetState)) {
+                if (state.equalsIgnoreCase(targetState)) {
                     listener.getLogger().println("current service state is " + targetState);
                     success = true;
                     break;
