@@ -131,3 +131,7 @@ test the plugin.
 ### Version 1.0.7 (December 11 2017)
 
 * Support custom timeout, and build variable in all fields.
+
+### Version 1.0.8 (December 21 2017)
+
+* Fixed issue of timeout logic.
