@@ -67,14 +67,14 @@ public class RancherBuilderTest {
         Services emptyServices = new Services();
         emptyServices.setData(Collections.emptyList());
 
-        when(rancherClient.services(anyString())).thenReturn(Optional.of(emptyServices));
+        when(rancherClient.services(anyString(), anyString())).thenReturn(Optional.of(emptyServices));
 
         Service newService = new Service();
         newService.setState("ACTIVE");
 
         when(rancherClient.createService(any(Service.class), anyString(), anyString())).thenReturn(Optional.of(newService));
 
-        when(rancherClient.service(anyString())).thenReturn(Optional.of(newService));
+        when(rancherClient.service(anyString(), anyString())).thenReturn(Optional.of(newService));
 
         // when
         rancherBuilder.perform(build, filePath, launcher, listener);
