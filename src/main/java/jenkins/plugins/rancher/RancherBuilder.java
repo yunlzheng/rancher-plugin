@@ -91,7 +91,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         listener.getLogger().printf("Deploy/Upgrade image[%s] to service [%s] to rancher environment [%s/projects/%s]%n", dockerUUID, service, endpoint, getEnvironmentId());
 
         Stack stack = getStack(listener, serviceField, rancherClient);
-        Optional<Services> services = rancherClient.services(stack.getId());
+        Optional<Services> services = rancherClient.services(getEnvironmentId(), stack.getId());
         if (!services.isPresent()) {
             throw new AbortException("Error happen when fetch stack<" + stack.getName() + "> services");
         }
@@ -200,7 +200,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         try {
             boolean success = false;
             while ((current - start) < timeoutMs) {
-                Optional<Service> checkService = rancherClient.service(serviceId);
+                Optional<Service> checkService = rancherClient.service(getEnvironmentId(), serviceId);
                 String state = checkService.get().getState();
                 if (state.equalsIgnoreCase(targetState)) {
                     listener.getLogger().println("current service state is " + targetState);
