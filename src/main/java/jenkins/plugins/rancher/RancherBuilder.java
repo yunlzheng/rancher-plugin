@@ -153,8 +153,9 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
         if (!Strings.isNullOrEmpty(ports)) {
             launchConfig.setPorts(Arrays.asList(ports.split(",")));
-            inServiceStrategy.setStartFirst(false);
         }
+
+        inServiceStrategy.setStartFirst(launchConfig.getPorts().isEmpty());
 
         inServiceStrategy.setLaunchConfig(launchConfig);
         serviceUpgrade.setInServiceStrategy(inServiceStrategy);
