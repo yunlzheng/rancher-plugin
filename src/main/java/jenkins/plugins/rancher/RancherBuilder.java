@@ -130,12 +130,13 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     }
 
     private RancherClient newRancherClient(String endpoint) {
-        Optional<StandardUsernamePasswordCredentials> credential = credentialsUtil.getCredential(credentialId);
-        if (credential.isPresent()) {
-            return new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
-        } else {
-            return new RancherClient(endpoint);
+        if (!Strings.isNullOrEmpty(credentialId)) {
+            Optional<StandardUsernamePasswordCredentials> credential = credentialsUtil.getCredential(credentialId);
+            if (credential.isPresent()) {
+                return new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
+            }
         }
+        return new RancherClient(endpoint);
     }
 
     private void checkServiceState(Service service, TaskListener listener) throws AbortException {
@@ -375,7 +376,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         }
 
         public FormValidation doCheckPorts(@QueryParameter String value) {
-            if (Strings.isNullOrEmpty(value)){
+            if (Strings.isNullOrEmpty(value)) {
                 return FormValidation.ok();
             }
 
