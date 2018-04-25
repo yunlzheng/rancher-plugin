@@ -201,7 +201,9 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     }
 
     private void waitUntilServiceStateIs(String serviceId, String targetState, TaskListener listener) throws AbortException {
-        int timeoutMs = 1000 * timeout;
+
+        int timeoutMs = timeout != 0 ?  1000 * timeout : 1000 * 50;
+
         long start = System.currentTimeMillis();
         long current = System.currentTimeMillis();
         listener.getLogger().println("waiting service state to be " + targetState + " (timeout:" + timeout + "s)");
