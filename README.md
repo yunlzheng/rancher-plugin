@@ -133,3 +133,7 @@ test the plugin.
 ### Version 1.0.8 (December 21 2017)
 
 * Fixed issue of timeout logic.
+
+### Version 1.0.10 (April 25 2018)
+
+* Fixed issues.
