@@ -186,4 +186,12 @@ public class LaunchConfig {
     public void setLogConfig(LogConfig logConfig) {
         this.logConfig = logConfig;
     }
+
+    public List<Secret> getSecrets() {
+        return secrets;
+    }
+
+    public void setSecrets(List<Secret> secrets) {
+        this.secrets = secrets;
+    }
 }

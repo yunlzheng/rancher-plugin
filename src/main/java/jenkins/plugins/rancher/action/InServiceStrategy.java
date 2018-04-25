@@ -8,7 +8,7 @@ public class InServiceStrategy {
     private int batchSize = 1;
     private int intervalMillis = 2000;
     private LaunchConfig launchConfig;
-    private boolean startFirst = true;
+    private boolean startFirst;
 
     public int getBatchSize() {
         return batchSize;
