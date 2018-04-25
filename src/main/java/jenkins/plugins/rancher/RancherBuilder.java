@@ -18,6 +18,7 @@ import jenkins.plugins.rancher.action.ServiceUpgrade;
 import jenkins.plugins.rancher.entity.*;
 import jenkins.plugins.rancher.entity.Stack;
 import jenkins.plugins.rancher.util.CredentialsUtil;
+import jenkins.plugins.rancher.util.EnvironmentParser;
 import jenkins.plugins.rancher.util.Parser;
 import jenkins.plugins.rancher.util.ServiceField;
 import jenkins.tasks.SimpleBuildStep;
@@ -246,15 +247,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
     }
 
     private Map<String, Object> customEnvironments(String environments) {
-        HashMap<String, Object> map = new HashMap<>();
-        String[] fragments = environments.split(",");
-        for (String fragement : fragments) {
-            if (fragement.contains(":")) {
-                String[] env = fragement.split(":");
-                map.put(env[0], env[1]);
-            }
-        }
-        return map;
+        return EnvironmentParser.parse(environments);
     }
 
     private boolean isEqual(ServiceField serviceField, Stack stack1) {
