@@ -14,7 +14,7 @@ services:
     volumes:
     - "../build/libs/rancher.hpi:/usr/share/jenkins/ref/plugins/rancher.jpi"
   rancher-node:
-    image: "rancher/agent:v1.2.7"
+    image: "rancher/agent:v1.2.10"
     entrypoint: /entrypoint.py
     privileged: true
     volumes:

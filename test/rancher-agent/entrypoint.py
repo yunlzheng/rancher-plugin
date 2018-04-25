@@ -30,6 +30,7 @@ XML_TEMPLATE = '''
       <confirm>true</confirm>
       <ports></ports>
       <environments></environments>
+      <timeout>50</timeout>
     </jenkins.plugins.rancher.RancherBuilder>
   </builders>
   <publishers/>
