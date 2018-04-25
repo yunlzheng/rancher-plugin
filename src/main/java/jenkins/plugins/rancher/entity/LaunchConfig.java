@@ -33,6 +33,8 @@ public class LaunchConfig {
 
     private boolean tty = true;
 
+    private List<Secret> secrets = new ArrayList<>();
+
     public InstanceHealthCheck getHealthCheck() {
         return healthCheck;
     }
