@@ -375,6 +375,10 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         }
 
         public FormValidation doCheckPorts(@QueryParameter String value) {
+            if (Strings.isNullOrEmpty(value)){
+                return FormValidation.ok();
+            }
+
             String[] ports = value.split(",");
             boolean inValid = Arrays.asList(ports)
                     .stream()
