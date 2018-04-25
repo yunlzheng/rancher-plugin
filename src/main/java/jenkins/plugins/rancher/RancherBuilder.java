@@ -82,9 +82,14 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        initializeClient();
+
         Map<String, String> buildEnvironments = getBuildEnvs(build, listener);
         String dockerUUID = String.format("docker:%s", Parser.paraser(image, buildEnvironments));
+
+        initializeClient(Parser.paraser(endpoint, buildEnvironments));
+
+        Parser.paraser(endpoint, buildEnvironments);
+
         Map<String, Object> environments = this.customEnvironments(Parser.paraser(this.environments, buildEnvironments));
         String service = Parser.paraser(this.service, buildEnvironments);
         ServiceField serviceField = new ServiceField(service);
@@ -114,17 +119,17 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
         this.rancherClient = rancherClient;
     }
 
-    private void initializeClient() {
+    private void initializeClient(String endpoint) {
         if (credentialsUtil == null) {
             credentialsUtil = new CredentialsUtil();
         }
 
         if (rancherClient == null) {
-            rancherClient = newRancherClient();
+            rancherClient = newRancherClient(endpoint);
         }
     }
 
-    private RancherClient newRancherClient() {
+    private RancherClient newRancherClient(String endpoint) {
         Optional<StandardUsernamePasswordCredentials> credential = credentialsUtil.getCredential(credentialId);
         if (credential.isPresent()) {
             return new RancherClient(endpoint, credential.get().getUsername(), credential.get().getPassword().getPlainText());
@@ -257,6 +262,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
 
     private Map<String, String> getBuildEnvs(Run<?, ?> build, TaskListener listener) {
         Map<String, String> envs = new HashMap<>();
+
         try {
             EnvVars environment = build.getEnvironment(listener);
             environment.keySet().forEach(key -> {
