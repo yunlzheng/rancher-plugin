@@ -33,6 +33,9 @@ public class LaunchConfig {
 
     private boolean tty = true;
 
+    private String requestedHostId;
+    private String requestedIpAddress;
+
     private List<Secret> secrets = new ArrayList<>();
 
     public InstanceHealthCheck getHealthCheck() {
@@ -193,5 +196,13 @@ public class LaunchConfig {
 
     public void setSecrets(List<Secret> secrets) {
         this.secrets = secrets;
+    }
+
+    public String getRequestedHostId() {
+        return requestedHostId;
+    }
+
+    public void setRequestedHostId(String requestedHostId) {
+        this.requestedHostId = requestedHostId;
     }
 }

@@ -102,7 +102,7 @@ public class RancherBuilder extends Builder implements SimpleBuildStep {
             throw new AbortException("Error happen when fetch stack<" + stack.getName() + "> services");
         }
 
-        Optional<Service> serviceInstance = services.get().getData().stream().filter(service1 -> service1.getName().equals(serviceField.getServiceName())).findAny();
+        Optional<Service> serviceInstance = services.get().getData().stream().filter(s -> s.getName().equals(serviceField.getServiceName())).findAny();
         if (serviceInstance.isPresent()) {
             upgradeService(serviceInstance.get(), dockerUUID, listener, environments);
         } else {
